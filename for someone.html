@@ -1,0 +1,250 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Proposal 💖</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #ffb6d9, #ffc3a0, #ff8fab);
+  text-align: center;
+}
+
+.card {
+  background: white;
+  padding: 35px 22px;
+  width: 90%;
+  max-width: 420px;
+  border-radius: 25px;
+  box-shadow: 0 10px 35px #d6338455;
+  z-index: 2;
+}
+
+h1 { color: #ff267e; }
+
+p { color: #777; font-size: 18px; }
+
+.buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  margin-top: 30px;
+  min-height: 60px;
+}
+
+button {
+  border: none;
+  border-radius: 30px;
+  padding: 14px 28px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#yes {
+  background: #ff2780;
+  color: white;
+}
+
+#no {
+  background: #ddd;
+  color: #333;
+  position: relative;
+}
+
+#result {
+  display: none;
+  color: #ff267e;
+}
+
+#fireworks {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.heart {
+  position: fixed;
+  bottom: -30px;
+  animation: float 6s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes float {
+  to { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+}
+
+a {
+  color: #e1306c;
+  font-weight: bold;
+  text-decoration: none;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="fireworks"></canvas>
+
+<div class="card">
+  <div id="question">
+    <div style="font-size:65px">💖🥹</div>
+    <h1>Will you be my GF? 💕</h1>
+    <p>You make my world more beautiful 🌎💗</p>
+    <p>Please say yes! 🥺🌹</p>
+
+    <div class="buttons">
+      <button id="yes">Yes 💖</button>
+      <button id="no">Noo 🙈</button>
+    </div>
+  </div>
+
+  <div id="result">
+    <div style="font-size:75px">💖🎉💍</div>
+    <h1>YAYYYY!! ❤️🥹</h1>
+    <p>You just made me the happiest person ever! 💕</p>
+    <p>Officially my favorite person now 😘💗</p>
+    <h2>🎆🎇🎆</h2>
+    <p>Text me on Instagram 📩</p>
+    <a href="https://www.instagram.com/" target="_blank">
+      @Aarogya_khanal 💌
+    </a>
+    <p style="font-size:14px">Find me: Aarogya Khanal 💗</p>
+  </div>
+</div>
+
+<script>
+const yes = document.getElementById("yes");
+const no = document.getElementById("no");
+const question = document.getElementById("question");
+const result = document.getElementById("result");
+
+function moveNo() {
+  const maxX = Math.max(0, window.innerWidth - no.offsetWidth - 20);
+  const maxY = Math.max(0, window.innerHeight - no.offsetHeight - 20);
+
+  no.style.position = "fixed";
+  no.style.left = Math.random() * maxX + "px";
+  no.style.top = Math.random() * maxY + "px";
+}
+
+no.addEventListener("mouseover", moveNo);
+no.addEventListener("click", moveNo);
+no.addEventListener("touchstart", function(e) {
+  e.preventDefault();
+  moveNo();
+}, { passive: false });
+
+yes.addEventListener("click", () => {
+  question.style.display = "none";
+  no.style.display = "none";
+  result.style.display = "block";
+  startFireworks();
+
+  for (let i = 0; i < 30; i++) {
+    setTimeout(createHeart, i * 100);
+  }
+});
+
+function createHeart() {
+  const heart = document.createElement("div");
+  heart.className = "heart";
+  heart.textContent = ["💖", "💕", "💗", "❤️", "💘"][Math.floor(Math.random()*5)];
+  heart.style.left = Math.random() * 100 + "vw";
+  heart.style.fontSize = (20 + Math.random() * 25) + "px";
+  document.body.appendChild(heart);
+  setTimeout(() => heart.remove(), 6000);
+}
+
+const canvas = document.getElementById("fireworks");
+const ctx = canvas.getContext("2d");
+let particles = [];
+let running = false;
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener("resize", resize);
+resize();
+
+function burst(x, y) {
+  const colors = ["#ff267e", "#ffd700", "#ff6347", "#9b5de5", "#00bbf9"];
+
+  for (let i = 0; i < 90; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 2 + Math.random() * 6;
+
+    particles.push({
+      x, y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      life: 80,
+      color: colors[Math.floor(Math.random() * colors.length)]
+    });
+  }
+}
+
+function startFireworks() {
+  running = true;
+  let count = 0;
+
+  const interval = setInterval(() => {
+    burst(
+      Math.random() * canvas.width,
+      Math.random() * canvas.height * 0.65
+    );
+    count++;
+    if (count > 14) clearInterval(interval);
+  }, 350);
+
+  animate();
+}
+
+function animate() {
+  if (!running) return;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  particles.forEach(p => {
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += 0.035;
+    p.life--;
+
+    ctx.globalAlpha = Math.max(0, p.life / 80);
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  particles = particles.filter(p => p.life > 0);
+  ctx.globalAlpha = 1;
+
+  if (particles.length > 0 ||
+      document.getElementById("result").style.display === "block") {
+    requestAnimationFrame(animate);
+  } else {
+    running = false;
+  }
+}
+</script>
+
+</body>
+</html>
